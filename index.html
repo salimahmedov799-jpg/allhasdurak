@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>salimka</title>
+
   <style>
     body {
       margin: 0;
@@ -11,9 +12,9 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background: #000;
-      color: #00ff99;
+      background: linear-gradient(135deg, #000000, #0f2027);
       font-family: Arial, sans-serif;
+      color: #00ff99;
     }
 
     h1 {
@@ -21,13 +22,21 @@
       animation: glow 2s infinite alternate;
     }
 
-    img {
+    /* КАРТИНКА */
+    .zoom-img {
       max-width: 90%;
       border-radius: 20px;
       box-shadow: 0 0 25px #00ff99;
-      animation: zoom 3s infinite alternate;
+      cursor: pointer;
+      transition: transform 0.4s ease;
     }
 
+    .zoom-img.active {
+      transform: scale(1.8);
+      z-index: 10;
+    }
+
+    /* КНОПКА */
     button {
       margin-top: 25px;
       padding: 12px 25px;
@@ -38,32 +47,36 @@
       color: #000;
       cursor: pointer;
       box-shadow: 0 0 15px #00ff99;
+      transition: transform 0.3s;
     }
 
     button:hover {
       transform: scale(1.1);
     }
 
+    /* АНИМАЦИИ */
     @keyframes glow {
       from { text-shadow: 0 0 5px #00ff99; }
-      to { text-shadow: 0 0 20px #00ff99; }
-    }
-
-    @keyframes zoom {
-      from { transform: scale(1); }
-      to { transform: scale(1.05); }
+      to   { text-shadow: 0 0 20px #00ff99; }
     }
   </style>
 </head>
+
 <body>
 
   <h1>salimka</h1>
 
-  <img src="photo.png" alt="photo">
+  <img src="photo.png" class="zoom-img" onclick="zoom(this)" alt="photo">
 
   <button onclick="alert('sdelano salimka')">
     Нажми меня
   </button>
+
+  <script>
+    function zoom(img) {
+      img.classList.toggle("active");
+    }
+  </script>
 
 </body>
 </html>
