@@ -2,10 +2,10 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>salimka</title>
+  <title>alkhas I Muslim popi babuina</title>
 
   <style>
-    /* ЗАГРУЗКА */
+    /* ЭКРАН ЗАГРУЗКИ */
     #loader {
       position: fixed;
       inset: 0;
@@ -42,6 +42,7 @@
       color: #00ff99;
       opacity: 0;
       transition: opacity 1s ease;
+      text-align: center;
     }
 
     body.loaded {
@@ -50,6 +51,7 @@
 
     h1 {
       margin-bottom: 20px;
+      font-size: 32px;
       animation: glow 2s infinite alternate;
     }
 
@@ -99,10 +101,13 @@
     <div class="spinner"></div>
   </div>
 
-  <h1>salimka</h1>
+  <!-- ТЕКСТ СВЕРХУ -->
+  <h1>alkhas I Muslim popi babuina</h1>
 
+  <!-- КАРТИНКА -->
   <img src="photo.png" class="zoom-img" onclick="zoom(this)" alt="photo">
 
+  <!-- КНОПКА -->
   <button onclick="alert('sdelano salimka')">
     Нажми меня
   </button>
@@ -113,7 +118,7 @@
       img.classList.toggle("active");
     }
 
-    // ЗАГРУЗКА
+    // АНИМАЦИЯ ПРИ ЗАГРУЗКЕ
     window.onload = function () {
       document.getElementById("loader").style.display = "none";
       document.body.classList.add("loaded");
