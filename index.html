@@ -1,70 +1,69 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>salimka</title>
-<style.img {
-  width: 220px;
-  border-radius: 20px;
-  margin-top: 20px;
-  box-shadow: 0 0 15px #00ff99;
-  animation: zoom 2s infinite alternate;
-}
-
-@keyframes zoom {
-  from { transform: scale(1); }
-  to { transform: scale(1.05); }
-}>
-body {.img {
-  width: 220px;
-  border-radius: 20px;
-  margin-top: 20px;
-  box-shadow: 0 0 15px #00ff99;
-  animation: zoom 2s infinite alternate;
-}
-
-@keyframes zoom {
-  from { transform: scale(1); }
-  to { transform: scale(1.05); }
-}
-}
-  
-
-h1 {
-    font-size: 48px;
-    animation: glow 2s infinite alternate;
-}
-
-@keyframes glow {
-    from {
-        text-shadow: 0 0 10px #00ffcc;
-        transform: scale(1);
+  <meta charset="UTF-8">
+  <title>salimka</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      color: #00ff99;
+      font-family: Arial, sans-serif;
     }
-    to {
-        text-shadow: 0 0 30px #00ffff;
-        transform: scale(1.1);
+
+    h1 {
+      margin-bottom: 20px;
+      animation: glow 2s infinite alternate;
     }
-}
 
-button {
-    margin-top: 25px;
-    padding: 15px 30px;
-    font-size: 20px;
-    border-radius: 30px;
-    border: none;
-    cursor: pointer;
-    background: linear-gradient(45deg, #00ffcc, #00ffff);
-}
+    img {
+      max-width: 90%;
+      border-radius: 20px;
+      box-shadow: 0 0 25px #00ff99;
+      animation: zoom 3s infinite alternate;
+    }
 
-button:hover {
-    box-shadow: 0 0 20px #00ffff;
-}
-</style>
+    button {
+      margin-top: 25px;
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 30px;
+      background: #00ff99;
+      color: #000;
+      cursor: pointer;
+      box-shadow: 0 0 15px #00ff99;
+    }
+
+    button:hover {
+      transform: scale(1.1);
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 5px #00ff99; }
+      to { text-shadow: 0 0 20px #00ff99; }
+    }
+
+    @keyframes zoom {
+      from { transform: scale(1); }
+      to { transform: scale(1.05); }
+    }
+  </style>
 </head>
 <body>
 
-<h1>salimka</h1>
-<button onclick="alert('salimka 😎')">Нажми меня</button>
+  <h1>salimka</h1>
+
+  <img src="photo.png" alt="photo">
+
+  <button onclick="alert('sdelano salimka')">
+    Нажми меня
+  </button>
 
 </body>
 </html>
