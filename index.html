@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>salimka</title>
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    background: radial-gradient(circle, #000000, #111111);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    font-size: 48px;
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 0 0 10px #00ffcc;
+        transform: scale(1);
+    }
+    to {
+        text-shadow: 0 0 30px #00ffff;
+        transform: scale(1.1);
+    }
+}
+
+button {
+    margin-top: 25px;
+    padding: 15px 30px;
+    font-size: 20px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(45deg, #00ffcc, #00ffff);
+}
+
+button:hover {
+    box-shadow: 0 0 20px #00ffff;
+}
+</style>
+</head>
+<body>
+
+<h1>salimka</h1>
+<button onclick="alert('salimka 😎')">Нажми меня</button>
+
+</body>
+</html>
