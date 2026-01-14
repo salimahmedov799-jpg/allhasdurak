@@ -5,6 +5,31 @@
   <title>salimka</title>
 
   <style>
+    /* ЗАГРУЗКА */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .spinner {
+      width: 80px;
+      height: 80px;
+      border: 6px solid #00ff99;
+      border-top: 6px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ОСНОВНОЙ САЙТ */
     body {
       margin: 0;
       min-height: 100vh;
@@ -15,6 +40,12 @@
       background: linear-gradient(135deg, #000000, #0f2027);
       font-family: Arial, sans-serif;
       color: #00ff99;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    body.loaded {
+      opacity: 1;
     }
 
     h1 {
@@ -54,7 +85,6 @@
       transform: scale(1.1);
     }
 
-    /* АНИМАЦИИ */
     @keyframes glow {
       from { text-shadow: 0 0 5px #00ff99; }
       to   { text-shadow: 0 0 20px #00ff99; }
@@ -63,6 +93,11 @@
 </head>
 
 <body>
+
+  <!-- ЭКРАН ЗАГРУЗКИ -->
+  <div id="loader">
+    <div class="spinner"></div>
+  </div>
 
   <h1>salimka</h1>
 
@@ -73,9 +108,16 @@
   </button>
 
   <script>
+    // УВЕЛИЧЕНИЕ КАРТИНКИ
     function zoom(img) {
       img.classList.toggle("active");
     }
+
+    // ЗАГРУЗКА
+    window.onload = function () {
+      document.getElementById("loader").style.display = "none";
+      document.body.classList.add("loaded");
+    };
   </script>
 
 </body>
