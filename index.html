@@ -1,16 +1,19 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>alkhas I alkhas AI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>alkhas I AI</title>
 
 <style>
-* { box-sizing: border-box; font-family: Arial, sans-serif; }
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
 
 body {
   margin: 0;
-  background: #0b0b0b;
+  background: #0d0d0d;
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -32,81 +35,147 @@ header {
   padding: 15px;
 }
 
-.msg {
-  max-width: 80%;
-  margin-bottom: 12px;
-  padding: 10px 14px;
-  border-radius: 12px;
+.message {
+  max-width: 85%;
+  margin-bottom: 15px;
+  padding: 12px 15px;
+  border-radius: 10px;
   line-height: 1.4;
+  white-space: pre-wrap;
 }
 
 .user {
-  background: #1e1e1e;
-  align-self: flex-end;
+  background: #1f1f1f;
   margin-left: auto;
 }
 
-.ai {
-  background: #111;
+.bot {
+  background: #121212;
   border: 1px solid #222;
 }
 
 .cursor {
   display: inline-block;
-  margin-left: 2px;
   animation: blink 1s infinite;
 }
 
 @keyframes blink {
-  0%, 50%, 100% { opacity: 1; }
-  25%, 75% { opacity: 0; }
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 footer {
   display: flex;
   padding: 10px;
-  background: #000;
   border-top: 1px solid #222;
+  background: #000;
 }
 
 input {
   flex: 1;
-  padding: 10px;
+  padding: 12px;
   background: #111;
-  color: #fff;
   border: 1px solid #333;
+  color: #fff;
   border-radius: 8px;
   outline: none;
 }
 
 button {
-  margin-left: 8px;
-  padding: 10px 15px;
-  background: #1a1a1a;
-  color: #fff;
-  border: 1px solid #333;
+  margin-left: 10px;
+  padding: 12px 18px;
+  background: #19c37d;
+  border: none;
   border-radius: 8px;
+  color: #000;
+  font-weight: bold;
   cursor: pointer;
-}
-
-button:hover {
-  background: #222;
-}
-
-img.generated {
-  max-width: 100%;
-  border-radius: 12px;
-  margin-top: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<header>alkhas I alkhas AI</header>
+<header>alkhas I AI</header>
 
 <div id="chat"></div>
 
 <footer>
-  <input id="input" placeholder="Напиши вопрос..." />
-  <button
+  <input id="input" placeholder="Задай вопрос..." />
+  <button onclick="send()">➤</button>
+</footer>
+
+<script>
+const API_KEY = "PASTE_YOUR_API_KEY_HERE"; // ← ВСТАВЬ СЮДА КЛЮЧ
+
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+
+function addMessage(text, cls) {
+  const div = document.createElement("div");
+  div.className = "message " + cls;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+function typeText(el, text) {
+  let i = 0;
+  const cursor = document.createElement("span");
+  cursor.className = "cursor";
+  cursor.textContent = "▍";
+  el.appendChild(cursor);
+
+  const timer = setInterval(() => {
+    cursor.remove();
+    el.textContent += text[i];
+    el.appendChild(cursor);
+    i++;
+    chat.scrollTop = chat.scrollHeight;
+    if (i >= text.length) {
+      clearInterval(timer);
+      cursor.remove();
+    }
+  }, 20);
+}
+
+async function send() {
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = "";
+
+  addMessage(text, "user");
+
+  const botMsg = addMessage("", "bot");
+  typeText(botMsg, "Думаю...");
+
+  try {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + API_KEY
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: text }]
+      })
+    });
+
+    const data = await res.json();
+    botMsg.textContent = "";
+    typeText(botMsg, data.choices[0].message.content);
+
+  } catch (e) {
+    botMsg.textContent = "Ошибка подключения 😢";
+  }
+}
+
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") send();
+});
+</script>
+
+</body>
+</html>
