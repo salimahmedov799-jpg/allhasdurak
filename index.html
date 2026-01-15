@@ -21,56 +21,18 @@ body{
   overflow:hidden;
 }
 
-/* ===== LOADER ===== */
+/* ===== HACKER LOADER ===== */
 #loader{
   position:fixed;
   inset:0;
   z-index:20;
   background:#000;
   display:flex;
-  flex-direction:column;
   align-items:center;
   justify-content:center;
   transition:opacity .8s ease;
 }
 
-/* AI CORE */
-.core{
-  width:180px;
-  height:180px;
-  position:relative;
-  margin-bottom:30px;
-}
-
-.core::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:50%;
-  border:2px solid rgba(0,255,156,.5);
-  box-shadow:0 0 40px rgba(0,255,156,.6);
-  animation:spin 6s linear infinite;
-}
-
-.core::after{
-  content:"";
-  position:absolute;
-  inset:30px;
-  border-radius:50%;
-  background:radial-gradient(circle,#00ff9c 0%,#003322 70%,transparent 100%);
-  animation:pulse 2s ease-in-out infinite;
-}
-
-@keyframes spin{
-  from{transform:rotate(0deg)}
-  to{transform:rotate(360deg)}
-}
-@keyframes pulse{
-  0%,100%{transform:scale(1);opacity:.8}
-  50%{transform:scale(1.2);opacity:1}
-}
-
-/* TERMINAL */
 .terminal{
   width:90%;
   max-width:420px;
@@ -78,17 +40,22 @@ body{
   line-height:1.6;
   color:#00ff9c;
 }
-.line{white-space:pre-wrap}
+
+.line{
+  white-space:pre-wrap;
+}
+
 .cursor{
   display:inline-block;
   animation:blink 1s infinite;
 }
+
 @keyframes blink{
   0%,50%,100%{opacity:1}
   25%,75%{opacity:0}
 }
 
-/* MATRIX */
+/* ===== MATRIX ===== */
 #matrix{
   position:fixed;
   inset:0;
@@ -133,17 +100,23 @@ body{
   padding:14px 12px 80px;
   overflow-y:auto;
 }
-.msg{margin-bottom:14px;font-size:12.5px;line-height:1.55}
-.user{color:#e5e7eb}
+.msg{
+  margin-bottom:14px;
+  font-size:12.5px;
+  line-height:1.55;
+}
+.user{color:#e5e7eb;}
 .bot{
   padding-left:10px;
   border-left:2px solid #00ff9c;
   color:#b6ffe3;
+  position:relative;
 }
 .bot::before{
   content:"▍";
-  margin-left:-10px;
-  margin-right:6px;
+  position:absolute;
+  left:-10px;
+  color:#00ff9c;
   animation:blink 1s infinite;
 }
 
@@ -182,6 +155,7 @@ button{
   width:26px;
   height:26px;
   border-radius:50%;
+  cursor:pointer;
 }
 #voiceBtn{
   background:#020617;
@@ -194,9 +168,8 @@ button{
 
 <body>
 
-<!-- LOADER -->
+<!-- HACKER LOADER -->
 <div id="loader">
-  <div class="core"></div>
   <div class="terminal" id="terminal"></div>
 </div>
 
@@ -207,7 +180,9 @@ button{
     <div class="header-title">&gt; Salim AI :: MATRIX NODE</div>
     <div class="status">STATUS: CONNECTED</div>
   </div>
+
   <div class="messages" id="messages"></div>
+
   <div class="input">
     <div class="input-box">
       <button id="voiceBtn">🎤</button>
@@ -218,16 +193,18 @@ button{
 </div>
 
 <script>
-/* BOOT */
+/* ===== HACKER BOOT ===== */
 const terminal=document.getElementById("terminal");
 const boot=[
- "SALIM AI CORE v5.1",
- "Neural core synchronization...",
- "Quantum layers online...",
- "AI consciousness stable",
- "MATRIX LINK ESTABLISHED",
+ "SALIM AI CORE v5.0",
+ "Initializing system...",
+ "Loading neural modules...",
+ "Decrypting data streams...",
+ "Bypassing firewall...",
+ "Establishing MATRIX connection...",
  "ACCESS GRANTED"
 ];
+
 let l=0,c=0;
 function type(){
   if(l>=boot.length){
@@ -235,7 +212,7 @@ function type(){
       const loader=document.getElementById("loader");
       loader.style.opacity=0;
       setTimeout(()=>loader.remove(),800);
-    },900);
+    },700);
     return;
   }
   if(c===0){
@@ -244,33 +221,50 @@ function type(){
     terminal.appendChild(d);
   }
   const line=terminal.lastChild;
-  line.textContent+=boot[l][c++];
+  line.textContent+=boot[l][c];
+  c++;
   if(c>=boot[l].length){
     line.innerHTML+=` <span class="cursor">▍</span>`;
     l++; c=0;
     setTimeout(type,350);
-  }else setTimeout(type,30);
+  }else{
+    setTimeout(type,35);
+  }
 }
 type();
 
 /* MATRIX */
 const canvas=document.getElementById("matrix");
 const ctx=canvas.getContext("2d");
-function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
-resize();onresize=resize;
+function resize(){
+  canvas.width=innerWidth;
+  canvas.height=innerHeight;
+}
+resize(); onresize=resize;
+
 const letters="01アカサタナハマヤラワABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const fs=13;
-const cols=Array.from({length:canvas.width/fs},()=>Math.random()*canvas.height);
+const fontSize=13;
+const columns=Array.from({length:canvas.width/fontSize},()=>Math.random()*canvas.height);
+
 setInterval(()=>{
-  ctx.fillStyle="rgba(0,0,0,.05)";
+  ctx.fillStyle="rgba(0,0,0,0.05)";
   ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.fillStyle="#00ff9c";
-  ctx.font=fs+"px JetBrains Mono";
-  cols.forEach((y,i)=>{
-    ctx.fillText(letters[Math.random()*letters.length|0],i*fs,y);
-    cols[i]=y>canvas.height?0:y+fs;
+  ctx.font=fontSize+"px JetBrains Mono";
+  columns.forEach((y,i)=>{
+    ctx.fillText(letters[Math.random()*letters.length|0],i*fontSize,y);
+    columns[i]=y>canvas.height?0:y+fontSize;
   });
 },55);
+
+/* VOICE */
+function speak(t){
+  if(!speechSynthesis)return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t);
+  u.lang="ru-RU";
+  speechSynthesis.speak(u);
+}
 
 /* CHAT */
 const messages=document.getElementById("messages");
@@ -278,10 +272,10 @@ const input=document.getElementById("text");
 const sendBtn=document.getElementById("sendBtn");
 const voiceBtn=document.getElementById("voiceBtn");
 
-function add(t,r){
+function add(text,role){
   const d=document.createElement("div");
-  d.className="msg "+r;
-  d.textContent=t;
+  d.className="msg "+role;
+  d.textContent=text;
   messages.appendChild(d);
   messages.scrollTop=messages.scrollHeight;
 }
@@ -299,15 +293,18 @@ async function send(){
       body:JSON.stringify({message:t})
     });
     const j=await r.json();
-    messages.lastChild.textContent=j.reply||"NO RESPONSE";
+    const reply=j.reply||"NO RESPONSE";
+    messages.lastChild.textContent=reply;
+    speak(reply);
   }catch{
     messages.lastChild.textContent="CONNECTION ERROR";
   }
 }
+
 sendBtn.onclick=send;
 input.onkeydown=e=>e.key==="Enter"&&send();
 
-/* SPEECH */
+/* SPEECH INPUT */
 const SR=window.SpeechRecognition||webkitSpeechRecognition;
 if(SR){
   const r=new SR();
@@ -321,4 +318,4 @@ if(SR){
 </script>
 
 </body>
-</html>э
+</html>
