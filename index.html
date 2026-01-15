@@ -6,38 +6,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* ===== АНИМИРОВАННЫЙ ФОН ===== */
+/* ===== ЧЕРНЫЙ ФОН + ЛОГО ===== */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: url("https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg");
-  background-size: 120%;
-  background-position: center;
-  filter: blur(25px) brightness(0.3);
-  animation: bgmove 20s infinite alternate ease-in-out;
+  background:
+    radial-gradient(circle at center, rgba(255,255,255,0.04), transparent 60%),
+    #000;
   z-index: -2;
 }
+
 body::after {
   content: "";
   position: fixed;
   inset: 0;
-  background: linear-gradient(
-    120deg,
-    rgba(0,255,153,0.15),
-    rgba(0,100,255,0.15),
-    rgba(255,0,200,0.15)
-  );
-  animation: glow 10s infinite alternate;
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 220px;
+  opacity: 0.08;
+  animation: breathe 8s ease-in-out infinite;
   z-index: -1;
 }
-@keyframes bgmove {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
-}
-@keyframes glow {
-  0% { opacity: 0.3; }
-  100% { opacity: 0.6; }
+
+@keyframes breathe {
+  0%   { transform: scale(1); opacity: 0.06; }
+  50%  { transform: scale(1.05); opacity: 0.1; }
+  100% { transform: scale(1); opacity: 0.06; }
 }
 
 /* ===== ОСНОВА ===== */
@@ -53,18 +49,18 @@ body {
 
 header {
   text-align: center;
-  padding: 15px;
-  font-size: 22px;
-  font-weight: bold;
-  backdrop-filter: blur(10px);
-  background: rgba(0,0,0,0.4);
-  box-shadow: 0 0 20px #00ff99;
+  padding: 14px;
+  font-size: 18px;
+  letter-spacing: 1px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
 /* ===== ЧАТ ===== */
 #chat {
   flex: 1;
-  padding: 15px;
+  padding: 16px;
   overflow-y: auto;
 }
 
@@ -72,26 +68,23 @@ header {
   max-width: 80%;
   padding: 14px 18px;
   margin-bottom: 12px;
-  border-radius: 18px;
+  border-radius: 16px;
   line-height: 1.5;
-  backdrop-filter: blur(8px);
   white-space: pre-wrap;
 }
 
 .user {
-  background: linear-gradient(135deg, #00ff99, #00ffaa);
-  color: #000;
+  background: #0f0f0f;
+  border: 1px solid rgba(255,255,255,0.1);
   margin-left: auto;
-  box-shadow: 0 0 15px #00ff99;
 }
 
 .ai {
-  background: rgba(0,0,0,0.6);
-  border: 1px solid #00ff99;
-  box-shadow: 0 0 15px rgba(0,255,153,0.3);
+  background: #050505;
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
-/* ===== TYPING CURSOR ===== */
+/* ===== КУРСОР ПЕЧАТИ ===== */
 .cursor {
   display: inline-block;
   animation: blink 1s infinite;
@@ -104,9 +97,9 @@ header {
 /* ===== КАРТИНКИ ===== */
 img.generated {
   max-width: 100%;
-  border-radius: 16px;
+  border-radius: 14px;
   margin-top: 10px;
-  box-shadow: 0 0 25px #00ff99;
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
 /* ===== ВВОД ===== */
@@ -114,8 +107,8 @@ footer {
   display: flex;
   gap: 8px;
   padding: 12px;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(10px);
+  background: rgba(0,0,0,0.7);
+  border-top: 1px solid rgba(255,255,255,0.05);
 }
 
 input {
@@ -124,6 +117,8 @@ input {
   border-radius: 25px;
   border: none;
   outline: none;
+  background: #050505;
+  color: #e5e7eb;
   font-size: 16px;
 }
 
@@ -132,22 +127,21 @@ button {
   border-radius: 25px;
   border: none;
   cursor: pointer;
-  font-weight: bold;
-  background: #00ff99;
-  color: #000;
-  box-shadow: 0 0 15px #00ff99;
-  transition: transform 0.2s, box-shadow 0.2s;
+  background: #111;
+  color: #e5e7eb;
+  border: 1px solid rgba(255,255,255,0.15);
+  transition: background 0.2s;
 }
+
 button:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 25px #00ff99;
+  background: #1a1a1a;
 }
 </style>
 </head>
 
 <body>
 
-<header>alkhas AI • Free Neural Network</header>
+<header>alkhas AI</header>
 
 <div id="chat"></div>
 
@@ -172,23 +166,22 @@ function addMessage(text, cls) {
 }
 
 /* ===== TYPING EFFECT ===== */
-function typeText(element, text, speed = 25) {
-  element.innerHTML = "";
+function typeText(el, text, speed = 22) {
+  el.textContent = "";
   let i = 0;
   const cursor = document.createElement("span");
   cursor.className = "cursor";
   cursor.textContent = "▍";
-  element.appendChild(cursor);
+  el.appendChild(cursor);
 
-  const interval = setInterval(() => {
+  const timer = setInterval(() => {
     cursor.remove();
-    element.textContent += text[i];
-    element.appendChild(cursor);
+    el.textContent += text[i];
+    el.appendChild(cursor);
     i++;
     chat.scrollTop = chat.scrollHeight;
-
     if (i >= text.length) {
-      clearInterval(interval);
+      clearInterval(timer);
       cursor.remove();
     }
   }, speed);
@@ -216,8 +209,6 @@ async function sendText() {
 
   const data = await res.json();
   const answer = data[0]?.generated_text || "Ошибка генерации";
-
-  thinking.textContent = "";
   typeText(thinking, answer);
 }
 
