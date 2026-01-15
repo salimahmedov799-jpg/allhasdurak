@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>salim AI</title>
+<title>Salim AI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -108,18 +108,19 @@ button {
 
 <body>
 
-<header>salim AI</header>
+<header>Salim AI</header>
 
 <div id="chat"></div>
 
 <footer>
   <input id="input" placeholder="Напиши сообщение…" autocomplete="off">
-  <button onclick="send()">➤</button>
+  <button id="sendBtn">➤</button>
 </footer>
 
 <script>
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
+const sendBtn = document.getElementById("sendBtn");
 
 function typeMessage(text, cls) {
   const el = document.createElement("div");
@@ -146,28 +147,41 @@ function typeMessage(text, cls) {
   }, 18);
 }
 
-function fakeAI(q) {
-  return (
-    "Ты написал:\n" + q +
-    "\n\n🤖 Я — salim AI.\n" +
-    "Сейчас я работаю в демо-режиме.\n" +
-    "Если хочешь — я подключу настоящий ChatGPT через сервер."
-  );
-}
-
 function send() {
   if (!input.value.trim()) return;
 
   const text = input.value;
   input.value = "";
 
+  // сообщение пользователя
   typeMessage(text, "user");
 
-  setTimeout(() => {
-    typeMessage(fakeAI(text), "ai");
-  }, 700);
+  // AI думает...
+  const thinking = document.createElement("div");
+  thinking.className = "msg ai";
+  thinking.textContent = "AI думает…";
+  chat.appendChild(thinking);
+  chat.scrollTop = chat.scrollHeight;
+
+  fetch("https://salim-ai.onrender.com/api/chat", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ message: text })
+  })
+  .then(res => res.json())
+  .then(data => {
+    thinking.remove();
+    typeMessage(data.reply || "Нет ответа 😢", "ai");
+  })
+  .catch(() => {
+    thinking.remove();
+    typeMessage("Ошибка подключения 😢", "ai");
+  });
 }
 
+sendBtn.addEventListener("click", send);
 input.addEventListener("keydown", e => {
   if (e.key === "Enter") send();
 });
