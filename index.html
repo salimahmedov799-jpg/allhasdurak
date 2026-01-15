@@ -2,101 +2,126 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>salim Ai</title>
+<title>salim AI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+:root {
+  --bg: #0d0d0d;
+  --panel: #000;
+  --user: #1f1f1f;
+  --ai: #111;
+  --border: #222;
+  --accent: #19c37d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  background: #0d0d0d;
-  font-family: Arial, sans-serif;
+  background: var(--bg);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   color: #fff;
 }
 
+/* HEADER */
 header {
-  padding: 14px;
-  text-align: center;
-  font-weight: bold;
-  background: #000;
-  border-bottom: 1px solid #222;
+  height: 56px;
+  background: var(--panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
 }
 
+/* CHAT */
 #chat {
   padding: 20px;
-  height: calc(100vh - 130px);
+  height: calc(100vh - 116px);
   overflow-y: auto;
 }
 
+/* MESSAGE */
 .msg {
-  max-width: 80%;
+  max-width: 85%;
   padding: 12px 14px;
   margin: 10px 0;
   border-radius: 14px;
   white-space: pre-wrap;
+  line-height: 1.4;
 }
 
 .user {
-  background: #1e1e1e;
+  background: var(--user);
   margin-left: auto;
 }
 
 .ai {
-  background: #111;
-  border: 1px solid #222;
+  background: var(--ai);
+  border: 1px solid var(--border);
 }
 
+/* INPUT */
 footer {
+  height: 60px;
   display: flex;
   gap: 10px;
   padding: 10px;
-  background: #000;
-  border-top: 1px solid #222;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
 }
 
 input {
   flex: 1;
-  padding: 12px;
+  padding: 12px 14px;
   border-radius: 12px;
   border: none;
   background: #111;
   color: #fff;
+  font-size: 15px;
   outline: none;
 }
 
 button {
-  padding: 12px 20px;
+  padding: 0 18px;
   border-radius: 12px;
   border: none;
-  background: #19c37d;
-  font-weight: bold;
+  background: var(--accent);
+  font-weight: 700;
   cursor: pointer;
 }
 
+/* CURSOR */
 .cursor {
   animation: blink 1s infinite;
 }
+
 @keyframes blink {
-  0%,100% {opacity:1}
-  50% {opacity:0}
+  0%,100% { opacity: 1 }
+  50% { opacity: 0 }
 }
 </style>
 </head>
 
 <body>
 
-<header>alkhas I AI</header>
+<header>salim AI</header>
 
 <div id="chat"></div>
 
 <footer>
-  <input id="input" placeholder="Напиши сообщение..." />
+  <input id="input" placeholder="Напиши сообщение…" autocomplete="off">
   <button onclick="send()">➤</button>
 </footer>
 
 <script>
 const chat = document.getElementById("chat");
+const input = document.getElementById("input");
 
-function typeText(text, cls) {
+function typeMessage(text, cls) {
   const el = document.createElement("div");
   el.className = "msg " + cls;
   chat.appendChild(el);
@@ -109,43 +134,41 @@ function typeText(text, cls) {
 
   const timer = setInterval(() => {
     cursor.remove();
-    el.textContent += text[i];
+    el.textContent += text[i] || "";
     el.appendChild(cursor);
     i++;
     chat.scrollTop = chat.scrollHeight;
+
     if (i >= text.length) {
       clearInterval(timer);
       cursor.remove();
     }
-  }, 20);
+  }, 18);
 }
 
-function fakeAI(text) {
-  const answers = [
-    "Интересный вопрос 🤔",
-    "Я думаю, что это зависит от ситуации.",
-    "Можешь уточнить?",
-    "Давай разберём это подробнее.",
-    "Хороший вопрос!"
-  ];
-  return answers[Math.floor(Math.random() * answers.length)] + "\n\nТы написал: " + text;
+function fakeAI(q) {
+  return (
+    "Ты написал:\n" + q +
+    "\n\n🤖 Я — salim AI.\n" +
+    "Сейчас я работаю в демо-режиме.\n" +
+    "Если хочешь — я подключу настоящий ChatGPT через сервер."
+  );
 }
 
 function send() {
-  const input = document.getElementById("input");
   if (!input.value.trim()) return;
 
   const text = input.value;
   input.value = "";
 
-  typeText(text, "user");
+  typeMessage(text, "user");
 
   setTimeout(() => {
-    typeText(fakeAI(text), "ai");
-  }, 600);
+    typeMessage(fakeAI(text), "ai");
+  }, 700);
 }
 
-document.getElementById("input").addEventListener("keydown", e => {
+input.addEventListener("keydown", e => {
   if (e.key === "Enter") send();
 });
 </script>
