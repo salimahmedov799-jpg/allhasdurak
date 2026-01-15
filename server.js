@@ -15,7 +15,7 @@ app.get("/", (req, res) => {
   res.send("Salim AI server is running ✅");
 });
 
-// GPT чат
+// Чат
 app.post("/api/chat", async (req, res) => {
   try {
     const userMessage = req.body.message;
@@ -38,13 +38,14 @@ app.post("/api/chat", async (req, res) => {
 
     const data = await response.json();
 
-    const answer = data.output_text || "Нет ответа 😕";
+    const answer =
+      data?.output?.[0]?.content?.[0]?.text || "Пустой ответ от AI 😕";
 
     res.json({ reply: answer });
 
   } catch (error) {
     console.error(error);
-    res.json({ reply: "Ошибка сервера 😢" });
+    res.json({ reply: "Ошибка сервера ❌" });
   }
 });
 
