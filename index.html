@@ -6,25 +6,62 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+/* ===== АНИМИРОВАННЫЙ ФОН ===== */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg");
+  background-size: 120%;
+  background-position: center;
+  filter: blur(25px) brightness(0.3);
+  animation: bgmove 20s infinite alternate ease-in-out;
+  z-index: -2;
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(0,255,153,0.15),
+    rgba(0,100,255,0.15),
+    rgba(255,0,200,0.15)
+  );
+  animation: glow 10s infinite alternate;
+  z-index: -1;
+}
+@keyframes bgmove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+@keyframes glow {
+  0% { opacity: 0.3; }
+  100% { opacity: 0.6; }
+}
+
+/* ===== ОСНОВА ===== */
 body {
   margin: 0;
-  background: #0b0f14;
-  color: #e5e7eb;
   font-family: Arial, sans-serif;
+  color: #e5e7eb;
   display: flex;
   flex-direction: column;
   height: 100vh;
+  overflow: hidden;
 }
 
 header {
-  padding: 15px;
   text-align: center;
-  background: #020617;
-  font-size: 20px;
+  padding: 15px;
+  font-size: 22px;
   font-weight: bold;
-  box-shadow: 0 0 15px #00ff99;
+  backdrop-filter: blur(10px);
+  background: rgba(0,0,0,0.4);
+  box-shadow: 0 0 20px #00ff99;
 }
 
+/* ===== ЧАТ ===== */
 #chat {
   flex: 1;
   padding: 15px;
@@ -33,60 +70,84 @@ header {
 
 .msg {
   max-width: 80%;
-  padding: 12px 15px;
-  margin-bottom: 10px;
-  border-radius: 15px;
-  line-height: 1.4;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  border-radius: 18px;
+  line-height: 1.5;
+  backdrop-filter: blur(8px);
+  white-space: pre-wrap;
 }
 
 .user {
-  background: #00ff99;
+  background: linear-gradient(135deg, #00ff99, #00ffaa);
   color: #000;
   margin-left: auto;
-}
-
-.ai {
-  background: #020617;
-  border: 1px solid #00ff99;
-}
-
-img.generated {
-  max-width: 100%;
-  border-radius: 12px;
-  margin-top: 10px;
   box-shadow: 0 0 15px #00ff99;
 }
 
+.ai {
+  background: rgba(0,0,0,0.6);
+  border: 1px solid #00ff99;
+  box-shadow: 0 0 15px rgba(0,255,153,0.3);
+}
+
+/* ===== TYPING CURSOR ===== */
+.cursor {
+  display: inline-block;
+  animation: blink 1s infinite;
+}
+@keyframes blink {
+  0%,50%,100% { opacity: 1; }
+  25%,75% { opacity: 0; }
+}
+
+/* ===== КАРТИНКИ ===== */
+img.generated {
+  max-width: 100%;
+  border-radius: 16px;
+  margin-top: 10px;
+  box-shadow: 0 0 25px #00ff99;
+}
+
+/* ===== ВВОД ===== */
 footer {
   display: flex;
-  padding: 10px;
-  background: #020617;
-  gap: 5px;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
 }
 
 input {
   flex: 1;
-  padding: 12px;
-  border-radius: 20px;
+  padding: 14px;
+  border-radius: 25px;
   border: none;
   outline: none;
+  font-size: 16px;
 }
 
 button {
-  padding: 12px 16px;
-  border-radius: 20px;
+  padding: 14px 18px;
+  border-radius: 25px;
   border: none;
   cursor: pointer;
+  font-weight: bold;
   background: #00ff99;
   color: #000;
-  font-weight: bold;
+  box-shadow: 0 0 15px #00ff99;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px #00ff99;
 }
 </style>
 </head>
 
 <body>
 
-<header>alkhas AI — free neural network</header>
+<header>alkhas AI • Free Neural Network</header>
 
 <div id="chat"></div>
 
@@ -99,9 +160,7 @@ button {
 <script>
 const chat = document.getElementById("chat");
 const input = document.getElementById("prompt");
-
-// ⬇ МОЖНО ОСТАВИТЬ ПУСТЫМ (работает бесплатно, если HF доступен)
-const HF_TOKEN = ""; 
+const HF_TOKEN = ""; // можно оставить пустым
 
 function addMessage(text, cls) {
   const div = document.createElement("div");
@@ -109,6 +168,30 @@ function addMessage(text, cls) {
   div.textContent = text;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+/* ===== TYPING EFFECT ===== */
+function typeText(element, text, speed = 25) {
+  element.innerHTML = "";
+  let i = 0;
+  const cursor = document.createElement("span");
+  cursor.className = "cursor";
+  cursor.textContent = "▍";
+  element.appendChild(cursor);
+
+  const interval = setInterval(() => {
+    cursor.remove();
+    element.textContent += text[i];
+    element.appendChild(cursor);
+    i++;
+    chat.scrollTop = chat.scrollHeight;
+
+    if (i >= text.length) {
+      clearInterval(interval);
+      cursor.remove();
+    }
+  }, speed);
 }
 
 async function sendText() {
@@ -117,7 +200,7 @@ async function sendText() {
   input.value = "";
 
   addMessage(text, "user");
-  addMessage("Думаю...", "ai");
+  const thinking = addMessage("Думаю…", "ai");
 
   const res = await fetch(
     "https://api-inference.huggingface.co/models/gpt2",
@@ -132,12 +215,10 @@ async function sendText() {
   );
 
   const data = await res.json();
-  chat.lastChild.remove();
+  const answer = data[0]?.generated_text || "Ошибка генерации";
 
-  addMessage(
-    data[0]?.generated_text || "Ошибка генерации",
-    "ai"
-  );
+  thinking.textContent = "";
+  typeText(thinking, answer);
 }
 
 async function sendImage() {
@@ -146,7 +227,7 @@ async function sendImage() {
   input.value = "";
 
   addMessage(text, "user");
-  addMessage("Генерирую изображение...", "ai");
+  addMessage("Генерирую изображение…", "ai");
 
   const res = await fetch(
     "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2",
