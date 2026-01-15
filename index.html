@@ -7,7 +7,6 @@
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-
 *{box-sizing:border-box}
 
 body{
@@ -46,10 +45,7 @@ body{
   border-bottom:1px solid rgba(255,255,255,.06);
 }
 
-.header-title{
-  font-weight:700;
-  font-size:16px;
-}
+.header-title{font-weight:700;font-size:16px}
 
 .clear-btn{
   background:none;
@@ -88,7 +84,6 @@ body{
   max-width:100%;
   border-radius:16px;
   margin-top:6px;
-  box-shadow:0 10px 30px rgba(0,0,0,.6);
 }
 
 .input{
@@ -164,40 +159,31 @@ function add(text,role,save=true){
 memory.forEach(m=>add(m.text,m.role,false));
 
 function detectSmartMemory(text){
-  const patterns=[
-    /меня зовут (.+)/i,
-    /мое имя (.+)/i,
-    /я люблю (.+)/i,
-    /запомни,? что (.+)/i,
-    /я живу в (.+)/i
-  ];
-  patterns.forEach(p=>{
+  [/меня зовут (.+)/i,/я люблю (.+)/i,/я живу в (.+)/i]
+  .forEach(p=>{
     const m=text.match(p);
-    if(m){
-      smartMemory.push(m[0]);
-      saveAll();
-    }
+    if(m){ smartMemory.push(m[0]); saveAll(); }
   });
 }
 
 async function send(){
   const text=input.value.trim();
-  if(!text)return;
+  if(!text) return;
 
   add(text,"user");
   detectSmartMemory(text);
   input.value="";
 
-  add("Salim AI думает...","bot");
+  const botMsg = document.createElement("div");
+  botMsg.className="msg bot";
+  botMsg.textContent="Salim AI думает...";
+  messages.appendChild(botMsg);
+  messages.scrollTop=messages.scrollHeight;
 
-  const isImage = /картин|нарисуй|изображ|image|draw|art|фото/i.test(text);
-
-  const context = smartMemory.length
-    ? "Информация о пользователе: "+smartMemory.join("; ")+"\n"
-    : "";
+  const isImage=/картин|нарисуй|изображ|image|draw|art|фото/i.test(text);
 
   try{
-    const res = await fetch(
+    const res=await fetch(
       isImage
         ? "https://salim-ai.onrender.com/api/image"
         : "https://salim-ai.onrender.com/api/chat",
@@ -205,39 +191,36 @@ async function send(){
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify(
-          isImage
-            ? { prompt:text }
-            : { message: context + text }
+          isImage ? {prompt:text} : {message:text}
         )
       }
     );
 
-    const data = await res.json();
+    const data=await res.json();
 
     if(isImage && data.image){
-      messages.lastChild.innerHTML = `
+      botMsg.innerHTML = `
         <img src="${data.image}">
         <div style="font-size:12px;opacity:.6;margin-top:4px">
           🎨 Сгенерировано Salim AI
-        </div>
-      `;
+        </div>`;
     }else{
-      messages.lastChild.textContent = data.reply || "Нет ответа 😕";
-      memory[memory.length-1].text = data.reply;
+      botMsg.textContent=data.reply||"Нет ответа 😕";
+      memory.push({role:"bot",text:data.reply});
+      saveAll();
     }
-    saveAll();
   }catch{
-    messages.lastChild.textContent="Ошибка соединения ❌";
+    botMsg.textContent="Ошибка соединения ❌";
   }
 }
 
 document.getElementById("sendBtn").onclick=send;
+input.addEventListener("keydown",e=>e.key==="Enter"&&send());
 
 function clearAll(){
   if(!confirm("Очистить всю память?"))return;
   localStorage.clear();
-  memory=[];
-  smartMemory=[];
+  memory=[]; smartMemory=[];
   messages.innerHTML="";
 }
 
@@ -245,7 +228,7 @@ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 if(SR){
   const r=new SR();
   r.lang="ru-RU";
-  document.getElementById("voiceBtn").onclick=()=>r.start();
+  voiceBtn.onclick=()=>r.start();
   r.onresult=e=>input.value=e.results[0][0].transcript;
 }
 </script>
