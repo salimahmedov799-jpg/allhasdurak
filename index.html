@@ -1,190 +1,140 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Salim AI</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-:root {
-  --bg: #0d0d0d;
-  --panel: #000;
-  --user: #1f1f1f;
-  --ai: #111;
-  --border: #222;
-  --accent: #19c37d;
-}
-
-* {
-  box-sizing: border-box;
-}
-
 body {
   margin: 0;
-  background: var(--bg);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: Arial, sans-serif;
+  background: #0b0b0b;
   color: #fff;
-}
-
-/* HEADER */
-header {
-  height: 56px;
-  background: var(--panel);
   display: flex;
-  align-items: center;
   justify-content: center;
-  font-weight: 600;
-  border-bottom: 1px solid var(--border);
+  align-items: center;
+  height: 100vh;
 }
 
-/* CHAT */
-#chat {
-  padding: 20px;
-  height: calc(100vh - 116px);
+.chat {
+  width: 100%;
+  max-width: 420px;
+  height: 90vh;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.header {
+  padding: 15px;
+  text-align: center;
+  background: #0f0f0f;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.messages {
+  flex: 1;
+  padding: 15px;
   overflow-y: auto;
 }
 
-/* MESSAGE */
 .msg {
-  max-width: 85%;
-  padding: 12px 14px;
-  margin: 10px 0;
-  border-radius: 14px;
-  white-space: pre-wrap;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  max-width: 80%;
   line-height: 1.4;
 }
 
 .user {
-  background: var(--user);
+  background: #1f1f1f;
   margin-left: auto;
 }
 
-.ai {
-  background: var(--ai);
-  border: 1px solid var(--border);
+.bot {
+  background: #121212;
+  border: 1px solid #222;
 }
 
-/* INPUT */
-footer {
-  height: 60px;
+.input {
   display: flex;
-  gap: 10px;
   padding: 10px;
-  background: var(--panel);
-  border-top: 1px solid var(--border);
+  background: #0f0f0f;
 }
 
 input {
   flex: 1;
-  padding: 12px 14px;
-  border-radius: 12px;
+  padding: 12px;
+  border-radius: 10px;
   border: none;
-  background: #111;
-  color: #fff;
-  font-size: 15px;
   outline: none;
+  background: #1a1a1a;
+  color: #fff;
 }
 
 button {
-  padding: 0 18px;
-  border-radius: 12px;
+  margin-left: 8px;
+  padding: 0 16px;
+  border-radius: 10px;
   border: none;
-  background: var(--accent);
-  font-weight: 700;
-  cursor: pointer;
-}
-
-/* CURSOR */
-.cursor {
-  animation: blink 1s infinite;
-}
-
-@keyframes blink {
-  0%,100% { opacity: 1 }
-  50% { opacity: 0 }
+  background: #22c55e;
+  color: #000;
+  font-size: 18px;
 }
 </style>
 </head>
 
 <body>
 
-<header>Salim AI</header>
+<div class="chat">
+  <div class="header">Salim AI</div>
+  <div class="messages" id="messages"></div>
 
-<div id="chat"></div>
-
-<footer>
-  <input id="input" placeholder="Напиши сообщение…" autocomplete="off">
-  <button id="sendBtn">➤</button>
-</footer>
+  <div class="input">
+    <input id="text" placeholder="Напиши сообщение..." />
+    <button onclick="send()">➤</button>
+  </div>
+</div>
 
 <script>
-const chat = document.getElementById("chat");
-const input = document.getElementById("input");
-const sendBtn = document.getElementById("sendBtn");
+const messages = document.getElementById("messages");
+const input = document.getElementById("text");
 
-function typeMessage(text, cls) {
-  const el = document.createElement("div");
-  el.className = "msg " + cls;
-  chat.appendChild(el);
-
-  let i = 0;
-  const cursor = document.createElement("span");
-  cursor.textContent = "▍";
-  cursor.className = "cursor";
-  el.appendChild(cursor);
-
-  const timer = setInterval(() => {
-    cursor.remove();
-    el.textContent += text[i] || "";
-    el.appendChild(cursor);
-    i++;
-    chat.scrollTop = chat.scrollHeight;
-
-    if (i >= text.length) {
-      clearInterval(timer);
-      cursor.remove();
-    }
-  }, 18);
+function add(text, cls) {
+  const div = document.createElement("div");
+  div.className = "msg " + cls;
+  div.textContent = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
 }
 
-function send() {
-  if (!input.value.trim()) return;
+async function send() {
+  const text = input.value.trim();
+  if (!text) return;
 
-  const text = input.value;
+  add(text, "user");
   input.value = "";
 
-  // сообщение пользователя
-  typeMessage(text, "user");
+  add("AI думает...", "bot");
 
-  // AI думает...
-  const thinking = document.createElement("div");
-  thinking.className = "msg ai";
-  thinking.textContent = "AI думает…";
-  chat.appendChild(thinking);
-  chat.scrollTop = chat.scrollHeight;
+  try {
+    const res = await fetch("https://salim-ai.onrender.com/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
 
-  fetch("https://salim-ai.onrender.com/api/chat", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ message: text })
-  })
-  .then(res => res.json())
-  .then(data => {
-    thinking.remove();
-    typeMessage(data.reply || "Нет ответа 😢", "ai");
-  })
-  .catch(() => {
-    thinking.remove();
-    typeMessage("Ошибка подключения 😢", "ai");
-  });
+    const data = await res.json();
+    messages.lastChild.textContent = data.reply || "Нет ответа 😕";
+
+  } catch (e) {
+    messages.lastChild.textContent = "Ошибка соединения ❌";
+  }
 }
-
-sendBtn.addEventListener("click", send);
-input.addEventListener("keydown", e => {
-  if (e.key === "Enter") send();
-});
 </script>
 
 </body>
