@@ -1,39 +1,57 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
 <title>Salim AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   font-family: Arial, sans-serif;
-  background: #0b0b0b;
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
 }
 
-.chat {
+body {
+  height: 100vh;
+  overflow: hidden;
+  background: black;
+}
+
+/* ВИДЕО ФОН */
+.video-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  max-width: 420px;
-  height: 90vh;
-  background: #000;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+
+/* затемнение */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: -1;
+}
+
+/* ЧАТ */
+.chat {
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  border-radius: 16px;
-  overflow: hidden;
 }
 
 .header {
   padding: 15px;
   text-align: center;
-  background: #0f0f0f;
+  color: white;
+  font-size: 22px;
   font-weight: bold;
-  font-size: 18px;
+  backdrop-filter: blur(6px);
 }
 
 .messages {
@@ -43,97 +61,85 @@ body {
 }
 
 .msg {
-  margin-bottom: 12px;
-  padding: 10px 14px;
-  border-radius: 12px;
   max-width: 80%;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  color: white;
   line-height: 1.4;
 }
 
 .user {
-  background: #1f1f1f;
+  background: #2a2a2a;
   margin-left: auto;
 }
 
 .bot {
-  background: #121212;
-  border: 1px solid #222;
+  background: #0b0f1a;
+  border: 1px solid #1e2a5a;
 }
 
-.input {
+.input-box {
   display: flex;
-  padding: 10px;
-  background: #0f0f0f;
+  padding: 12px;
+  backdrop-filter: blur(8px);
 }
 
 input {
   flex: 1;
   padding: 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: none;
   outline: none;
-  background: #1a1a1a;
-  color: #fff;
+  font-size: 16px;
 }
 
 button {
-  margin-left: 8px;
-  padding: 0 16px;
-  border-radius: 10px;
+  margin-left: 10px;
+  padding: 12px 18px;
+  border-radius: 12px;
   border: none;
-  background: #22c55e;
-  color: #000;
-  font-size: 18px;
+  background: #3b82f6;
+  color: white;
+  font-size: 16px;
 }
 </style>
 </head>
 
 <body>
 
+<!-- КОСМИЧЕСКОЕ ВИДЕО -->
+<video class="video-bg" autoplay muted loop playsinline>
+  <source src="https://cdn.coverr.co/videos/coverr-earth-from-space-1561/1080p.mp4" type="video/mp4">
+</video>
+
+<div class="overlay"></div>
+
 <div class="chat">
-  <div class="header">Salim AI</div>
+  <div class="header">🌌 Salim AI</div>
   <div class="messages" id="messages"></div>
 
-  <div class="input">
-    <input id="text" placeholder="Напиши сообщение..." />
-    <button onclick="send()">➤</button>
+  <div class="input-box">
+    <input id="input" placeholder="Спроси что-нибудь у вселенной...">
+    <button onclick="send()">▶</button>
   </div>
 </div>
 
 <script>
-const messages = document.getElementById("messages");
-const input = document.getElementById("text");
+function send() {
+  const input = document.getElementById("input");
+  const messages = document.getElementById("messages");
+  if (!input.value.trim()) return;
 
-function add(text, cls) {
-  const div = document.createElement("div");
-  div.className = "msg " + cls;
-  div.textContent = text;
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
-}
+  messages.innerHTML += `<div class="msg user">${input.value}</div>`;
 
-async function send() {
-  const text = input.value.trim();
-  if (!text) return;
+  setTimeout(() => {
+    messages.innerHTML += `<div class="msg bot">🌌 Космос бесконечен, как и возможности Salim AI</div>`;
+    messages.scrollTop = messages.scrollHeight;
+  }, 700);
 
-  add(text, "user");
   input.value = "";
-
-  add("AI думает...", "bot");
-
-  try {
-    const res = await fetch("https://salim-ai.onrender.com/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
-    });
-
-    const data = await res.json();
-    messages.lastChild.textContent = data.reply || "Нет ответа 😕";
-
-  } catch (e) {
-    messages.lastChild.textContent = "Ошибка соединения ❌";
-  }
+  messages.scrollTop = messages.scrollHeight;
 }
 </script>
 
