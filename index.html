@@ -21,6 +21,77 @@ body{
   overflow:hidden;
 }
 
+/* ===== LOADER PLANET ===== */
+#loader{
+  position:fixed;
+  inset:0;
+  z-index:20;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:radial-gradient(circle at center, #020b18, #000);
+  transition:opacity .8s ease;
+}
+
+.planet-wrap{
+  width:220px;
+  height:220px;
+  position:relative;
+}
+
+.planet{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(120,180,255,.6), rgba(0,60,120,.25) 60%, rgba(0,20,40,.5)),
+    linear-gradient(120deg, rgba(255,255,255,.08), rgba(0,0,0,0));
+  box-shadow:
+    0 0 40px rgba(80,160,255,.45),
+    inset -30px -20px 50px rgba(0,0,0,.7);
+  animation:spin 14s linear infinite;
+}
+
+.planet::after{
+  content:"";
+  position:absolute;
+  inset:-8px;
+  border-radius:50%;
+  box-shadow:0 0 35px rgba(120,180,255,.6);
+}
+
+.scan{
+  position:absolute;
+  inset:-20px;
+  border-radius:50%;
+  border:1px solid rgba(120,180,255,.35);
+  animation:pulse 3s ease-in-out infinite;
+}
+
+@keyframes spin{
+  from{transform:rotate(0)}
+  to{transform:rotate(360deg)}
+}
+@keyframes pulse{
+  0%{opacity:.1; transform:scale(.9)}
+  50%{opacity:.6}
+  100%{opacity:.1; transform:scale(1.1)}
+}
+
+.loader-title{
+  margin-top:26px;
+  color:#9ad7ff;
+  letter-spacing:3px;
+  font-size:18px;
+}
+.loader-sub{
+  font-size:11px;
+  opacity:.6;
+  margin-top:6px;
+}
+
+/* ===== MATRIX ===== */
 #matrix{
   position:fixed;
   inset:0;
@@ -138,6 +209,16 @@ button{
 
 <body>
 
+<!-- LOADER -->
+<div id="loader">
+  <div class="planet-wrap">
+    <div class="planet"></div>
+    <div class="scan"></div>
+  </div>
+  <div class="loader-title">SALIM AI</div>
+  <div class="loader-sub">Neural Core Initializing</div>
+</div>
+
 <canvas id="matrix"></canvas>
 
 <div class="chat">
@@ -158,19 +239,25 @@ button{
 </div>
 
 <script>
+/* LOADER HIDE */
+setTimeout(()=>{
+  const l=document.getElementById("loader");
+  l.style.opacity=0;
+  setTimeout(()=>l.remove(),800);
+},4500);
+
 /* MATRIX */
 const canvas=document.getElementById("matrix");
 const ctx=canvas.getContext("2d");
 function resize(){
-  canvas.width=window.innerWidth;
-  canvas.height=window.innerHeight;
+  canvas.width=innerWidth;
+  canvas.height=innerHeight;
 }
-resize(); window.onresize=resize;
+resize(); onresize=resize;
 
 const letters="01アカサタナハマヤラワABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const fontSize=13;
-let columns=[];
-for(let i=0;i<canvas.width/fontSize;i++) columns[i]=Math.random()*canvas.height;
+const columns=Array.from({length:canvas.width/fontSize},()=>Math.random()*canvas.height);
 
 setInterval(()=>{
   ctx.fillStyle="rgba(0,0,0,0.05)";
@@ -185,11 +272,10 @@ setInterval(()=>{
 
 /* VOICE OUT */
 function speak(text){
-  if(!window.speechSynthesis) return;
+  if(!speechSynthesis)return;
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(text);
   u.lang="ru-RU";
-  u.rate=1;
   speechSynthesis.speak(u);
 }
 
@@ -208,21 +294,20 @@ function add(text,role){
 }
 
 async function send(){
-  const text=input.value.trim();
-  if(!text)return;
-
-  add(text,"user");
+  const t=input.value.trim();
+  if(!t)return;
+  add(t,"user");
   input.value="";
   add("Processing request...","bot");
 
   try{
-    const res=await fetch("https://salim-ai.onrender.com/api/chat",{
+    const r=await fetch("https://salim-ai.onrender.com/api/chat",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:text})
+      body:JSON.stringify({message:t})
     });
-    const data=await res.json();
-    const reply=data.reply||"NO RESPONSE";
+    const j=await r.json();
+    const reply=j.reply||"NO RESPONSE";
     messages.lastChild.textContent=reply;
     speak(reply);
   }catch{
@@ -231,10 +316,10 @@ async function send(){
 }
 
 sendBtn.onclick=send;
-input.addEventListener("keydown",e=>{if(e.key==="Enter")send()});
+input.onkeydown=e=>e.key==="Enter"&&send();
 
 /* SPEECH INPUT */
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const SR=window.SpeechRecognition||webkitSpeechRecognition;
 if(SR){
   const r=new SR();
   r.lang="ru-RU";
