@@ -3,317 +3,136 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Salim AI :: MATRIX</title>
+<title>Salim AI</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap');
 *{box-sizing:border-box}
-
 body{
   margin:0;
-  font-family:'JetBrains Mono', monospace;
-  background:#000;
+  background:#0f0f0f;
   color:#e5e7eb;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100dvh;
-  overflow:hidden;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
 }
 
-/* ===== HACKER LOADER ===== */
-#loader{
-  position:fixed;
-  inset:0;
-  z-index:20;
-  background:#000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  transition:opacity .8s ease;
-}
-
-.terminal{
-  width:90%;
-  max-width:420px;
-  font-size:13px;
-  line-height:1.6;
-  color:#00ff9c;
-}
-
-.line{
-  white-space:pre-wrap;
-}
-
-.cursor{
-  display:inline-block;
-  animation:blink 1s infinite;
-}
-
-@keyframes blink{
-  0%,50%,100%{opacity:1}
-  25%,75%{opacity:0}
-}
-
-/* ===== MATRIX ===== */
-#matrix{
-  position:fixed;
-  inset:0;
-  z-index:0;
-  opacity:.25;
-}
-
-/* CHAT */
-.chat{
-  position:relative;
-  z-index:2;
-  width:100%;
-  max-width:380px;
+/* APP */
+.app{
+  max-width:900px;
+  margin:auto;
   height:100dvh;
   display:flex;
   flex-direction:column;
-  background:rgba(0,0,0,.85);
-  border-left:1px solid rgba(0,255,156,.25);
-  border-right:1px solid rgba(0,255,156,.25);
-  backdrop-filter:blur(6px);
 }
 
 /* HEADER */
 .header{
-  padding:10px 14px;
-  border-bottom:1px solid rgba(0,255,156,.25);
-}
-.header-title{
-  font-weight:700;
-  font-size:13px;
-  color:#00ff9c;
-}
-.status{
-  font-size:10px;
-  color:#00ff9c;
-  opacity:.7;
+  padding:14px 16px;
+  border-bottom:1px solid #1f1f1f;
+  background:#0f0f0f;
+  font-weight:600;
 }
 
-/* MESSAGES */
-.messages{
+/* CHAT */
+.chat{
   flex:1;
-  padding:14px 12px 80px;
   overflow-y:auto;
+  padding:20px;
 }
+
 .msg{
+  max-width:85%;
+  padding:12px 14px;
   margin-bottom:14px;
-  font-size:12.5px;
-  line-height:1.55;
+  border-radius:14px;
+  font-size:15px;
+  line-height:1.5;
+  word-wrap:break-word;
 }
-.user{color:#e5e7eb;}
-.bot{
-  padding-left:10px;
-  border-left:2px solid #00ff9c;
-  color:#b6ffe3;
-  position:relative;
+
+.ai{
+  background:#171717;
+  border:1px solid #222;
 }
-.bot::before{
-  content:"▍";
-  position:absolute;
-  left:-10px;
-  color:#00ff9c;
-  animation:blink 1s infinite;
+
+.user{
+  background:#2563eb;
+  color:#fff;
+  margin-left:auto;
 }
 
 /* INPUT */
 .input{
-  position:fixed;
-  bottom:0;
-  left:50%;
-  transform:translateX(-50%);
-  width:100%;
-  max-width:380px;
-  padding:8px;
-  background:rgba(0,0,0,.95);
-  border-top:1px solid rgba(0,255,156,.25);
-}
-.input-box{
   display:flex;
-  background:#020617;
-  border-radius:16px;
-  padding:5px;
-  border:1px solid rgba(0,255,156,.25);
+  gap:10px;
+  padding:14px;
+  border-top:1px solid #1f1f1f;
+  background:#0f0f0f;
 }
-input{
+
+textarea{
   flex:1;
-  border:none;
-  background:none;
-  color:#00ff9c;
-  padding:7px;
-  font-size:12px;
+  resize:none;
+  background:#171717;
+  border:1px solid #262626;
+  border-radius:12px;
+  padding:12px;
+  color:#fff;
+  font-size:15px;
   outline:none;
 }
+
 button{
+  background:#2563eb;
   border:none;
-  background:#00ff9c;
-  color:#000;
-  width:26px;
-  height:26px;
-  border-radius:50%;
+  border-radius:12px;
+  padding:0 18px;
+  font-size:16px;
+  color:#fff;
   cursor:pointer;
 }
-#voiceBtn{
-  background:#020617;
-  color:#00ff9c;
-  margin-right:5px;
-  border:1px solid rgba(0,255,156,.25);
-}
+button:hover{opacity:.9}
 </style>
 </head>
 
 <body>
 
-<!-- HACKER LOADER -->
-<div id="loader">
-  <div class="terminal" id="terminal"></div>
-</div>
+<div class="app">
 
-<canvas id="matrix"></canvas>
+  <div class="header">Salim AI</div>
 
-<div class="chat">
-  <div class="header">
-    <div class="header-title">&gt; Salim AI :: MATRIX NODE</div>
-    <div class="status">STATUS: CONNECTED</div>
+  <div class="chat" id="chat">
+    <div class="msg ai">Привет! Я Salim AI. Чем могу помочь?</div>
   </div>
-
-  <div class="messages" id="messages"></div>
 
   <div class="input">
-    <div class="input-box">
-      <button id="voiceBtn">🎤</button>
-      <input id="text" placeholder="Введите команду..." />
-      <button id="sendBtn">➤</button>
-    </div>
+    <textarea id="text" rows="1" placeholder="Написать сообщение..."></textarea>
+    <button onclick="send()">➤</button>
   </div>
+
 </div>
 
 <script>
-/* ===== HACKER BOOT ===== */
-const terminal=document.getElementById("terminal");
-const boot=[
- "SALIM AI CORE v5.0",
- "Initializing system...",
- "Loading neural modules...",
- "Decrypting data streams...",
- "Bypassing firewall...",
- "Establishing MATRIX connection...",
- "ACCESS GRANTED"
-];
-
-let l=0,c=0;
-function type(){
-  if(l>=boot.length){
-    setTimeout(()=>{
-      const loader=document.getElementById("loader");
-      loader.style.opacity=0;
-      setTimeout(()=>loader.remove(),800);
-    },700);
-    return;
-  }
-  if(c===0){
-    const d=document.createElement("div");
-    d.className="line";
-    terminal.appendChild(d);
-  }
-  const line=terminal.lastChild;
-  line.textContent+=boot[l][c];
-  c++;
-  if(c>=boot[l].length){
-    line.innerHTML+=` <span class="cursor">▍</span>`;
-    l++; c=0;
-    setTimeout(type,350);
-  }else{
-    setTimeout(type,35);
-  }
-}
-type();
-
-/* MATRIX */
-const canvas=document.getElementById("matrix");
-const ctx=canvas.getContext("2d");
-function resize(){
-  canvas.width=innerWidth;
-  canvas.height=innerHeight;
-}
-resize(); onresize=resize;
-
-const letters="01アカサタナハマヤラワABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const fontSize=13;
-const columns=Array.from({length:canvas.width/fontSize},()=>Math.random()*canvas.height);
-
-setInterval(()=>{
-  ctx.fillStyle="rgba(0,0,0,0.05)";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle="#00ff9c";
-  ctx.font=fontSize+"px JetBrains Mono";
-  columns.forEach((y,i)=>{
-    ctx.fillText(letters[Math.random()*letters.length|0],i*fontSize,y);
-    columns[i]=y>canvas.height?0:y+fontSize;
-  });
-},55);
-
-/* VOICE */
-function speak(t){
-  if(!speechSynthesis)return;
-  speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(t);
-  u.lang="ru-RU";
-  speechSynthesis.speak(u);
-}
-
-/* CHAT */
-const messages=document.getElementById("messages");
+const chat=document.getElementById("chat");
 const input=document.getElementById("text");
-const sendBtn=document.getElementById("sendBtn");
-const voiceBtn=document.getElementById("voiceBtn");
 
-function add(text,role){
-  const d=document.createElement("div");
-  d.className="msg "+role;
-  d.textContent=text;
-  messages.appendChild(d);
-  messages.scrollTop=messages.scrollHeight;
-}
+function send(){
+  const text=input.value.trim();
+  if(!text) return;
 
-async function send(){
-  const t=input.value.trim();
-  if(!t)return;
-  add(t,"user");
+  chat.innerHTML+=`<div class="msg user">${text}</div>`;
   input.value="";
-  add("Processing request...","bot");
-  try{
-    const r=await fetch("https://salim-ai.onrender.com/api/chat",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:t})
-    });
-    const j=await r.json();
-    const reply=j.reply||"NO RESPONSE";
-    messages.lastChild.textContent=reply;
-    speak(reply);
-  }catch{
-    messages.lastChild.textContent="CONNECTION ERROR";
-  }
-}
+  chat.scrollTop=chat.scrollHeight;
 
-sendBtn.onclick=send;
-input.onkeydown=e=>e.key==="Enter"&&send();
+  const ai=document.createElement("div");
+  ai.className="msg ai";
+  ai.textContent="Salim AI думает...";
+  chat.appendChild(ai);
+  chat.scrollTop=chat.scrollHeight;
 
-/* SPEECH INPUT */
-const SR=window.SpeechRecognition||webkitSpeechRecognition;
-if(SR){
-  const r=new SR();
-  r.lang="ru-RU";
-  r.onresult=e=>{
-    input.value=e.results[0][0].transcript;
-    send();
-  };
-  voiceBtn.onclick=()=>r.start();
+  /* 👉 Здесь потом подключим GPT API */
+  setTimeout(()=>{
+    ai.textContent="Это ответ Salim AI 🤖";
+    chat.scrollTop=chat.scrollHeight;
+  },800);
 }
 </script>
 
