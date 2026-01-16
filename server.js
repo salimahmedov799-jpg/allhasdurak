@@ -14,6 +14,12 @@ const PORT = process.env.PORT || 3000;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 // =======================
+// 🧠 ПАМЯТЬ (простая)
+// =======================
+let MEMORY = [];
+const MAX_MEMORY = 6;
+
+// =======================
 // ✅ ПРОВЕРКА СЕРВЕРА
 // =======================
 app.get("/", (req, res) => {
@@ -28,20 +34,40 @@ app.post("/api/chat", upload.single("image"), async (req, res) => {
     const userMessage = req.body.message || "";
 
     if (!userMessage && !req.file) {
-      return res.json({ reply: "Сообщение и изображение отсутствуют ❌" });
+      return res.json({ reply: "Сообщение отсутствует ❌" });
     }
 
     let content = [];
 
+    // ===== SYSTEM PROMPT =====
+    content.push({
+      type: "text",
+      text:
+        "Ты Salim AI — умный, спокойный и полезный ИИ.\n" +
+        "Отвечай на русском языке.\n" +
+        "Если просят код — давай код.\n" +
+        "Объясняй кратко и по делу.\n"
+    });
+
+    // ===== MEMORY =====
+    MEMORY.forEach(m => {
+      content.push({
+        type: "text",
+        text: m
+      });
+    });
+
+    // ===== USER MESSAGE =====
     if (userMessage) {
       content.push({
         type: "text",
-        text:
-          "Ты умный и дружелюбный помощник Salim AI. Отвечай понятно.\n\n" +
-          userMessage
+        text: userMessage
       });
+      MEMORY.push(userMessage);
+      MEMORY = MEMORY.slice(-MAX_MEMORY);
     }
 
+    // ===== IMAGE =====
     if (req.file) {
       const imageBase64 = fs.readFileSync(req.file.path, "base64");
       content.push({
@@ -73,8 +99,12 @@ app.post("/api/chat", upload.single("image"), async (req, res) => {
     const data = await response.json();
 
     const answer =
+      data?.output_text ||
       data?.output?.[0]?.content?.[0]?.text ||
-      "Пустой ответ от AI 😕";
+      "AI не дал ответа 😕";
+
+    MEMORY.push(answer);
+    MEMORY = MEMORY.slice(-MAX_MEMORY);
 
     res.json({ reply: answer });
 
@@ -114,22 +144,18 @@ app.post("/api/image", async (req, res) => {
     const data = await response.json();
 
     if (!data.data || !data.data[0]?.url) {
-      return res
-        .status(500)
-        .json({ error: "Ошибка генерации изображения" });
+      return res.status(500).json({ error: "Ошибка генерации изображения" });
     }
 
     res.json({ image: data.data[0].url });
 
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ error: "Ошибка сервера при генерации изображения" });
+    res.status(500).json({ error: "Ошибка сервера при генерации изображения" });
   }
 });
 
 // =======================
 app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
+  console.log("🚀 Salim AI server running on port " + PORT);
 });
