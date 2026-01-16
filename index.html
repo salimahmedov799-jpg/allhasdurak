@@ -140,42 +140,36 @@ const messages=document.getElementById("messages");
 const input=document.getElementById("text");
 const imageInput=document.getElementById("imageInput");
 
-let memory=JSON.parse(localStorage.getItem("salim_chat"))||[];
-let smartMemory=JSON.parse(localStorage.getItem("salim_smart"))||[];
-let imageData=null;
+let imageBase64=null;
 
-function saveAll(){
-  localStorage.setItem("salim_chat",JSON.stringify(memory));
-  localStorage.setItem("salim_smart",JSON.stringify(smartMemory));
-}
-
-function add(content,role,save=true){
+function add(content,role){
   const d=document.createElement("div");
   d.className="msg "+role;
   if(typeof content==="string") d.textContent=content;
   else d.appendChild(content);
   messages.appendChild(d);
   messages.scrollTop=messages.scrollHeight;
-  if(save){memory.push({role,content});saveAll();}
 }
 
-memory.forEach(m=>{
-  if(typeof m.content==="string") add(m.content,m.role,false);
-});
-
 document.getElementById("imageBtn").onclick=()=>imageInput.click();
+
 imageInput.onchange=()=>{
-  const f=imageInput.files[0];
-  if(!f)return;
-  const img=document.createElement("img");
-  img.src=URL.createObjectURL(f);
-  imageData=f;
-  add(img,"user");
+  const file=imageInput.files[0];
+  if(!file)return;
+
+  const reader=new FileReader();
+  reader.onload=()=>{
+    imageBase64=reader.result;
+    const img=document.createElement("img");
+    img.src=imageBase64;
+    add(img,"user");
+  };
+  reader.readAsDataURL(file);
 };
 
 async function send(){
   const text=input.value.trim();
-  if(!text && !imageData)return;
+  if(!text && !imageBase64)return;
 
   if(text) add(text,"user");
   input.value="";
@@ -183,35 +177,49 @@ async function send(){
   add("Salim AI думает...","bot");
 
   try{
-    const res=await fetch("https://salim-ai.onrender.com/api/chat",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:text})
-    });
-    const data=await res.json();
+    let res,data;
+
+    if(imageBase64){
+      res=await fetch("https://salim-ai.onrender.com/api/vision",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          image:imageBase64,
+          prompt:text||"Что на изображении?"
+        })
+      });
+    }else{
+      res=await fetch("https://salim-ai.onrender.com/api/chat",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({message:text})
+      });
+    }
+
+    data=await res.json();
     messages.lastChild.textContent=data.reply||"Нет ответа";
+
   }catch{
     messages.lastChild.textContent="Ошибка соединения";
   }
 
-  imageData=null;
+  imageBase64=null;
 }
 
 document.getElementById("sendBtn").onclick=send;
 
-function clearAll(){
-  if(!confirm("Очистить всё?"))return;
-  localStorage.clear();
-  memory=[];smartMemory=[];
-  messages.innerHTML="";
-}
-
-/* 🎤 */
+/* 🎤 голос */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 if(SR){
-  const r=new SR();r.lang="ru-RU";
+  const r=new SR();
+  r.lang="ru-RU";
   document.getElementById("voiceBtn").onclick=()=>r.start();
   r.onresult=e=>input.value=e.results[0][0].transcript;
+}
+
+function clearAll(){
+  if(!confirm("Очистить чат?"))return;
+  messages.innerHTML="";
 }
 </script>
 
